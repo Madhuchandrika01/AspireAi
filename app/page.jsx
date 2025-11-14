@@ -16,11 +16,20 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import Image from "next/image";
 import { features } from "@/data/features";
 import { testimonial } from "@/data/testimonial";
 import { faqs } from "@/data/faqs";
 import { howItWorks } from "@/data/howItWorks";
+
+// Helper to get initials like "SC", "MR", "PP"
+function getInitials(name) {
+  if (!name) return "";
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+}
 
 export default function LandingPage() {
   return (
@@ -108,33 +117,31 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Testimonials Section */}
       <section className="w-full py-12 md:py-24 bg-muted/50">
         <div className="container mx-auto px-4 md:px-6">
           <h2 className="text-3xl font-bold text-center mb-12">
             What Our Users Say
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {testimonial.map((testimonial, index) => (
+            {testimonial.map((item, index) => (
               <Card key={index} className="bg-background">
                 <CardContent className="pt-6">
                   <div className="flex flex-col space-y-4">
                     <div className="flex items-center space-x-4 mb-4">
-                      <div className="relative h-12 w-12 flex-shrink-0">
-                        <Image
-                          width={40}
-                          height={40}
-                          src={testimonial.image}
-                          alt={testimonial.author}
-                          className="rounded-full object-cover border-2 border-primary/20"
-                        />
+                      {/* Initials avatar instead of image */}
+                      <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
+                        <span className="text-sm font-semibold text-primary">
+                          {getInitials(item.author)}
+                        </span>
                       </div>
                       <div>
-                        <p className="font-semibold">{testimonial.author}</p>
+                        <p className="font-semibold">{item.author}</p>
                         <p className="text-sm text-muted-foreground">
-                          {testimonial.role}
+                          {item.role}
                         </p>
                         <p className="text-sm text-primary">
-                          {testimonial.company}
+                          {item.company}
                         </p>
                       </div>
                     </div>
@@ -143,7 +150,7 @@ export default function LandingPage() {
                         <span className="text-3xl text-primary absolute -top-4 -left-2">
                           &quot;
                         </span>
-                        {testimonial.quote}
+                        {item.quote}
                         <span className="text-3xl text-primary absolute -bottom-4">
                           &quot;
                         </span>
