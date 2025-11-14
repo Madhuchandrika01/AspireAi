@@ -9,7 +9,7 @@ const IndustryInsightsPage = async () => {
     redirect("/onboarding");
   }
 
-  // ✅ fetch the actual insights
+  
   const insights = await getIndustryInsights();
 
   return (

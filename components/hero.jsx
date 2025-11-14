@@ -15,7 +15,7 @@ const HeroSection = () => {
       const scrollPosition = window.scrollY;
       const scrollThreshold = 100;
 
-      if (imageElement) { // Safety check
+      if (imageElement) { 
         if (scrollPosition > scrollThreshold) {
           imageElement.classList.add("scrolled");
         } else {
@@ -48,11 +48,7 @@ const HeroSection = () => {
               Get Started
             </Button>
           </Link>
-          <Link href="https://www.youtube.com/watch?v=RsdCKcCO948">
-            <Button size="lg" variant="outline" className="px-8">
-              Watch Demo
-            </Button>
-          </Link>
+          
         </div>
         <div className="hero-image-wrapper mt-5 md:mt-0 relative w-full max-w-[1280px] mx-auto">
           <div ref={imageRef} className="hero-image w-full">

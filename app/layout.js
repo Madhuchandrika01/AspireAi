@@ -17,7 +17,6 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider
       appearance={{ baseTheme: dark }}
-      // ✅ use new props (replaces deprecated afterSignInUrl/afterSignUpUrl/redirectUrl)
       signInFallbackRedirectUrl="/dashboard"
       signUpFallbackRedirectUrl="/onboarding"
     >

@@ -61,13 +61,11 @@ export async function getUserOnboardingStatus() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  // Look up the user once
   const user = await db.user.findUnique({
     where: { clerkUserId: userId },
     select: { industry: true },
   });
 
-  // ✅ Do NOT throw here — just report not onboarded yet
   if (!user) {
     return { isOnboarded: false };
   }

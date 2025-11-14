@@ -18,10 +18,8 @@ import {
 import { checkUser } from "@/lib/checkUser";
 
 const Header = async () => {
-  // Ensure DB user exists (your original behavior)
   await checkUser();
 
-  // ✅ Server-side check: no client flicker, no modal error when already signed in
   const { userId } = await auth();
   const isSignedIn = !!userId;
 
@@ -87,7 +85,7 @@ const Header = async () => {
               />
             </>
           ) : (
-            // Not signed in → show modal buttons
+            
             <div className="flex items-center space-x-2">
               <SignInButton mode="modal" fallbackRedirectUrl="/dashboard">
                 <div className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
