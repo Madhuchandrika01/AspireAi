@@ -15,45 +15,54 @@ export async function updateUser(data) {
   if (!user) throw new Error("User not found");
 
   try {
-    const result = await db.$transaction(
-      async (tx) => {
-        // Find existing industry insight
-        let industryInsight = await tx.industryInsight.findUnique({
-          where: { industry: data.industry },
-        });
+    // 1) Make sure we have an industryInsight for this industry.
+    //    Do NOT wrap the AI call in a Prisma transaction.
+    let industryInsight = await db.industryInsight.findUnique({
+      where: { industry: data.industry },
+    });
 
-        // Create it (AI or fallback) if missing
-        if (!industryInsight) {
-          const insights = await generateAIInsights(data.industry);
-          industryInsight = await tx.industryInsight.create({
-            data: {
-              industry: data.industry,
-              ...insights,
-              nextUpdate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-            },
-          });
-        }
+    if (!industryInsight) {
+      // Slow part: call Gemini to generate insights
+      const insights = await generateAIInsights(data.industry);
 
-        // Update user profile
-        const updatedUser = await tx.user.update({
-          where: { id: user.id },
+      try {
+        industryInsight = await db.industryInsight.create({
           data: {
             industry: data.industry,
-            experience: data.experience,
-            bio: data.bio,
-            skills: data.skills,
+            ...insights,
+            nextUpdate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
           },
         });
+      } catch (createError) {
+        // In case of a race condition where another request created it first,
+        // just read the existing record.
+        console.error(
+          "Error creating industry insight, attempting to re-fetch:",
+          createError
+        );
+        industryInsight = await db.industryInsight.findUnique({
+          where: { industry: data.industry },
+        });
+      }
+    }
 
-        return { updatedUser, industryInsight };
+    // 2) Update user profile (simple DB query, no long transaction needed)
+    const updatedUser = await db.user.update({
+      where: { id: user.id },
+      data: {
+        industry: data.industry,
+        experience: data.experience,
+        bio: data.bio,
+        skills: data.skills,
       },
-      { timeout: 10000 }
-    );
+    });
 
-    return { success: true, ...result };
+    return { success: true, updatedUser, industryInsight };
   } catch (error) {
     console.error("Error updating user and industry:", error?.message || error);
-    throw new Error("Failed to update profile: " + (error?.message || "Unknown error"));
+    throw new Error(
+      "Failed to update profile: " + (error?.message || "Unknown error")
+    );
   }
 }
 
